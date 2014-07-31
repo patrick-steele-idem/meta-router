@@ -50,7 +50,7 @@ app.use(function(req, res, next) {
 });
 
 // Invoke the route handler (if available) and end the response:
-app.use(require('meta-router/middleware').invokeHandler()); // Invoke the route handler and end the response
+app.use(require('meta-router/middleware').invokeHandler());
 ```
 
 The API is described in more detail in the next section.
@@ -80,7 +80,7 @@ The `routes` argument can either be an `Array` of routes or a path to a JSON rou
         // Any additional metadata to associate with this route: (optional)
         "foo": "bar",
     },
-    // Alternatively multiple HTTP methods can be matched
+    // Alternatively, multiple HTTP methods can be matched
     {
         "methods": ["GET", "POST"]
         "path": "/foo", // HTTP method and path
