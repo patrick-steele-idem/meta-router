@@ -4,8 +4,6 @@ module.exports = function invokeHandler() {
         var handler;
 
         if (route && (handler = route.config.handler)) {
-
-
             var params = route.params;
             
             if (params) {

@@ -6,6 +6,29 @@ var expect = require('chai').expect;
 var request = require('request');
 var express = require('express');
 var http = require('http');
+var nodePath = require('path');
+
+var app;
+var server;
+var port;
+
+function jsonRequest(path, method, callback) {
+    var options = {
+        url: 'http://localhost:' + port + path,
+        method: method || 'GET'
+    };
+    request(options, function(err, response, body) {
+        if (err) {
+            return callback(err);
+        }
+
+        if (response.statusCode === 200) {
+            body = JSON.parse(body);
+        }
+
+        callback(null, response, body);
+    });
+}
 
 describe('meta-router' , function() {
 
@@ -26,7 +49,7 @@ describe('meta-router' , function() {
                 {
                     "path": "GET /users/:user",
                     "handler": function(req, res) {
-                        res.end('Hello user: ', req.params.user);
+                        res.end('Hello user: ' + req.params.user);
                     },
                     // Arbitrary metadata:
                     "foo": "bar"
@@ -68,34 +91,13 @@ describe('meta-router' , function() {
     });
 
     describe('middleware' , function() {
-        var app;
-        var server;
-        var port;
-
-        function jsonRequest(path, method, callback) {
-            var options = {
-                url: 'http://localhost:' + port + path,
-                method: method || 'GET'
-            };
-            request(options, function(err, response, body) {
-                if (err) {
-                    return callback(err);
-                }
-
-                if (response.statusCode === 200) {
-                    body = JSON.parse(body);
-                }
-
-                callback(null, response, body);
-            });
-        }
 
         before(function(done) {
 
             var metaRouterMiddleware = require('../middleware');
             app = express();
-            
-            var routes = [
+
+            app.use(metaRouterMiddleware.match([
                     {
                         path: 'GET /users/:user',
                         handler: function(req, res) {
@@ -112,9 +114,7 @@ describe('meta-router' , function() {
                             res.end('User profile picture updated!');
                         }
                     }
-                ];
-
-            app.use(metaRouterMiddleware.match(routes));
+                ]));
 
             app.use(function(req, res, next) {
                 req.matchedRoute = req.route;
@@ -296,6 +296,58 @@ describe('meta-router' , function() {
         });
     });
 
-    
+    describe('middleware using routes.json' , function() {
+        before(function(done) {
+
+            var metaRouterMiddleware = require('../middleware');
+            app = express();
+
+            app.use(metaRouterMiddleware.match(nodePath.join(__dirname, 'routes.json')));
+
+            app.use(function(req, res, next) {
+                req.matchedRoute = req.route;
+                next();
+            });
+
+            app.use(metaRouterMiddleware.invokeHandler());
+
+            app.use(function(req, res, next){
+              res.send(404, 'Not Found');
+            });
+
+            app.use(function(err, req, res, next){
+              console.error(err.stack);
+              res.send(500, 'Server error');
+            });
+
+            server = http.createServer(app);
+            server.on('listening', function() {
+                port = server.address().port;
+                done();
+            });
+
+            server.listen();
+        });
+
+        after(function() {
+            server.close();
+        });
+
+        it('should match a route loaded from a json file', function(done) {
+            jsonRequest('/users/frank', 'GET', function(err, response, result) {
+                if (err) {
+                    return done(err);
+                }
+
+                expect(result).to.deep.equal({
+                    message: 'Hello frank!'
+                });
+
+                done();
+            });
+
+            
+        });
+    });
 
 });

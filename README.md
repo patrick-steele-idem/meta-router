@@ -23,7 +23,7 @@ app.use(require('meta-router/middleware').match([
     {
         "path": "GET /users/:user",
         "handler": function(req, res) {
-            res.end('Hello user: ', req.params.user);
+            res.end('Hello user: ' + req.params.user);
         },
         "foo": "bar" // <-- Arbitrary metadata
     },
@@ -106,17 +106,17 @@ app.use(require('meta-router/middleware').match("routes.json"));
 
 Then in `routes.json`:
 
-```json
+```js
 [
     {
         "path": "GET /users/:user", // HTTP method and path
-        "handler": "module:./path/to/user/handler/module" // Path to a module that exports a route handler function
+        "handler": "require:./path/to/user/handler/module" // Path to a module that exports a route handler function
         },
         "middleware": [  // Route-specific middleware to run right before the handler (optional)
-            "module:./path/to/some/middleware/module" // Path to a module that exports a route handler function
+            "require:./path/to/some/middleware/module" // Path to a module that exports a route handler function
         ],
         // Any additional metadata to associate with this route: (optional)
-        "foo": "bar",
+        "foo": "bar"
     },
     ...
 ]
@@ -125,7 +125,7 @@ Then in `routes.json`:
 A few things to note when using a JSON routes file:
 
 * JavaScript comments are allowed in the JSON configuration file (they are stripped out before parsing)
-* [shortstop](https://github.com/krakenjs/shortstop) is used to preprocess the loaded JSON file to resolve handler functions and middleware. A special `module` resolver is registered for shortstop to resolve and load a module. The `handler` property and `middleware` elements must use the `module` resolver to load a module that exports a function.
+* [shortstop](https://github.com/krakenjs/shortstop) is used to preprocess the loaded JSON file to resolve handler functions and middleware. All of the handlers provided by [shortstop-handlers](https://github.com/krakenjs/shortstop-handlers)
 
 ## invokeHandler() middleware
 

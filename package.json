@@ -24,7 +24,12 @@
   },
   "homepage": "https://github.com/patrick-steele-idem/meta-router",
   "dependencies": {
-    "path-to-regexp": "^0.2.3"
+    "jsonminify": "^0.2.3",
+    "path-to-regexp": "^0.2.3",
+    "raptor-async": "^0.2.8-beta",
+    "resolve-from": "^1.0.0",
+    "shortstop": "^1.0.1",
+    "shortstop-handlers": "^1.0.0"
   },
   "devDependencies": {
     "chai": "^1.9.1",
