@@ -1,11 +1,14 @@
 var metaRouter = require('../');
 var DataHolder = require('raptor-async/DataHolder');
+var nodePath = require('path');
 
 module.exports = function match(routes) {
     var matcher;
     var matcherDataHolder;
 
     if (typeof routes === 'string') {
+        routes = nodePath.resolve(process.cwd(), routes);
+        
         matcherDataHolder = new DataHolder();
         metaRouter.routesLoader.load(routes, function(err, routes) {
             if (err) {
