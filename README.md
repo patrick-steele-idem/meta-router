@@ -43,7 +43,7 @@ app.use(function(req, res, next) {
         console.log('Route params: ', route.params);     // e.g. { user: 'John' }
         console.log('Route path: ', route.path);     // e.g. "/users/123"
         console.log('Route path: ', route.config.path);     // e.g. "/users/:user"
-        console.log('Route method: ', route.config.method); // e.g. "GET"
+        console.log('Route methods: ', route.config.methods); // e.g. ['GET']
         console.log('Route foo: ', route.config.foo);       // e.g. "bar"
     }
     next();
@@ -132,7 +132,7 @@ A few things to note when using a JSON routes file:
 The `invokeHandler()` can be used to invoke a route handler associated with the matched route.
 
 ```javascript
-require('meta-router/middleware').invokeHandler();
+app.use(require('meta-router/middleware').invokeHandler());
 ```
 
 If a route with a handler was matched, then the associated handler function will be invoked (passing in the `req` and `res` objects). The route handler is expected to end the response to complete the request. If no route was matched or if the route does not have an associated handler then the next middleware in the chain will be invoked.
