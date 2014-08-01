@@ -1,9 +1,9 @@
 meta-router
 =============
 
-This simple, declarative URL router for Express provides support for associating metadata with a route. This module allows an incoming request to be matched to a route at the beginning of the request and allows the handling of the request to be deferred to later in the request. This is helpful in many applications, because intermediate middleware can use the metadata associated with the matched route to conditionally apply security checks, tracking, additional debugging, etc. 
+This simple, declarative URL router provides Express middleware that can be used to associate metadata with a route. In addition, this module allows an incoming request to be matched to a route at the beginning of the request and allows the handling of the request to be deferred to later in the request. This is helpful in many applications, because intermediate middleware can use the metadata associated with the matched route to conditionally apply security checks, tracking, additional debugging, etc. 
 
-Internally, this module utilizes the same module used by Express to parse and match URLs--thus providing an easy transition from the builtin Express router to this router.
+Internally, this module utilizes the same module used by Express to parse and match URLs--thus providing an easy transition from the builtin Express router to this router. The router also exposes an API that can be used independent of Express to match a path to route.
 
 # Installation
 
@@ -74,7 +74,7 @@ The `routes` argument can either be an `Array` of routes or a path to a JSON rou
         "handler": function(req, res) { // Route handler function
             ...
         }, // Route handler function
-        "middleware": [  // Route-specific middleware to run right before the handler (optional)
+        "middleware": [  // Route-specific middleware to run right before the handler (NOTE: not yet implemented)
             ...
         ],
         // Any additional metadata to associate with this route: (optional)
@@ -125,7 +125,7 @@ Then in `routes.json`:
 A few things to note when using a JSON routes file:
 
 * JavaScript comments are allowed in the JSON configuration file (they are stripped out before parsing)
-* [shortstop](https://github.com/krakenjs/shortstop) is used to preprocess the loaded JSON file to resolve handler functions and middleware. All of the handlers provided by [shortstop-handlers](https://github.com/krakenjs/shortstop-handlers)
+* [shortstop](https://github.com/krakenjs/shortstop) is used to preprocess the loaded JSON file to resolve handler functions and middleware. All of the handlers provided by [shortstop-handlers](https://github.com/krakenjs/shortstop-handlers) are registered.
 
 ## invokeHandler() middleware
 
@@ -136,6 +136,46 @@ app.use(require('meta-router/middleware').invokeHandler());
 ```
 
 If a route with a handler was matched, then the associated handler function will be invoked (passing in the `req` and `res` objects). The route handler is expected to end the response to complete the request. If no route was matched or if the route does not have an associated handler then the next middleware in the chain will be invoked.
+
+## buildMatcher(routes)
+
+Given an Array of routes, the `buildMatcher(routes)` method will return an object with a `match(path[, method])` method that can be used to match a path or path+method to one of the provided routes.
+
+Usage:
+
+```javascript
+var matcher = require('meta-router').buildMatcher([
+    {
+        path: 'GET /users/:user',
+        handler: function(req, res) {
+            ...
+        }
+    },
+    ...
+]);
+
+var match = matcher.match('/users/123', 'GET');
+// match.params.user === '123'
+// match.config.path === '/users/:user'
+```
+
+Since the `method` argument is optional, the following is also supported:
+
+```javascript
+var matcher = require('meta-router').buildMatcher([
+    {
+        path: '/users/:user',
+        handler: function(req, res) {
+            ...
+        }
+    },
+    ...
+]);
+
+var match = matcher.match('/users/123');
+// match.params.user === '123'
+// match.config.path === '/users/:user'
+```
 
 ## TODO
 
@@ -148,7 +188,12 @@ If a route with a handler was matched, then the associated handler function will
 
 ## Contribute
 
-Pull requests, bug reports and feature requests welcome.
+Pull requests, bug reports and feature requests welcome. To run tests:
+
+```bash
+npm install
+npm test
+```
 
 ## License
 

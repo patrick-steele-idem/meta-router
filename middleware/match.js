@@ -8,7 +8,7 @@ module.exports = function match(routes) {
 
     if (typeof routes === 'string') {
         routes = nodePath.resolve(process.cwd(), routes);
-        
+
         matcherDataHolder = new DataHolder();
         metaRouter.routesLoader.load(routes, function(err, routes) {
             if (err) {
@@ -23,7 +23,7 @@ module.exports = function match(routes) {
     }
 
     function go(matcher, req, res, next) {
-        var match = matcher.match(req.method, req.path);
+        var match = matcher.match(req.path, req.method);
         if (match) {
             req.route = match;
         }

@@ -62,7 +62,7 @@ describe('meta-router' , function() {
                 }
             ]);
 
-            var match = matcher.match('GET', '/users/123');
+            var match = matcher.match('/users/123', 'GET');
             expect(match != null).to.equal(true);
             expect(match.path).to.equal('/users/123');
             expect(match.params).to.deep.equal({ user: '123' });
@@ -71,14 +71,14 @@ describe('meta-router' , function() {
             expect(match.config.methods).to.deep.equal(['GET']);
             expect(match.config.foo).to.equal('bar');
 
-            match = matcher.match('GET', '/usersINVALID/123');
+            match = matcher.match('/usersINVALID/123', 'GET');
 
             expect(match == null).to.equal(true);
 
-            match = matcher.match('POST', '/users/123');
+            match = matcher.match('/users/123', 'POST');
             expect(match == null).to.equal(true);
 
-            match = matcher.match('POST', '/users/123/picture');
+            match = matcher.match('/users/123/picture', 'POST');
             expect(match != null).to.equal(true);
             expect(match.path).to.equal('/users/123/picture');
             expect(match.params).to.deep.equal({ user: '123' });
@@ -87,6 +87,44 @@ describe('meta-router' , function() {
             expect(match.config.methods).to.deep.equal(['POST']);
 
             
+        });
+
+        it('should allow method to be optional', function() {
+            var metaRouter = require('../');
+            var matcher = metaRouter.buildMatcher([
+                {
+                    path: "/users/:user/picture",
+                    handler: function(req, res) {
+                        res.end('User profile picture updated!');
+                    }
+                },
+                {
+                    "path": "/users/:user",
+                    "handler": function(req, res) {
+                        res.end('Hello user: ' + req.params.user);
+                    },
+                    // Arbitrary metadata:
+                    "foo": "bar"
+                }
+            ]);
+
+            var match = matcher.match('/users/123');
+            expect(match != null).to.equal(true);
+            expect(match.path).to.equal('/users/123');
+            expect(match.params).to.deep.equal({ user: '123' });
+            expect(match.config.path).to.equal('/users/:user');
+            expect(match.config.handler).to.be.a('function');
+            expect(match.config.foo).to.equal('bar');
+
+            match = matcher.match('/usersINVALID/123');
+            expect(match == null).to.equal(true);
+
+            match = matcher.match('/users/123/picture');
+            expect(match != null).to.equal(true);
+            expect(match.path).to.equal('/users/123/picture');
+            expect(match.params).to.deep.equal({ user: '123' });
+            expect(match.config.path).to.equal('/users/:user/picture');
+            expect(match.config.handler).to.be.a('function');
         });
     });
 
