@@ -37,5 +37,5 @@
         "mocha": "^1.21.3",
         "request": "^2.39.0"
     },
-    "version": "1.0.1-beta"
+    "version": "1.0.2-beta"
 }
