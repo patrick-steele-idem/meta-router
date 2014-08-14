@@ -1,5 +1,5 @@
-module.exports = function invokeHandler() {
-    return function(req, res, next) {
+module.exports = function invokeHandlerFactory() {
+    return function invokeHandler(req, res, next) {
         var route = req.route;
         var handler;
 

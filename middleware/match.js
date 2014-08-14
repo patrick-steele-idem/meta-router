@@ -2,7 +2,7 @@ var metaRouter = require('../');
 var DataHolder = require('raptor-async/DataHolder');
 var nodePath = require('path');
 
-module.exports = function match(routes) {
+module.exports = function matchFactory(routes) {
     var matcher;
     var matcherDataHolder;
 
@@ -31,7 +31,7 @@ module.exports = function match(routes) {
         next(); 
     }
 
-    return function(req, res, next) {
+    return function match(req, res, next) {
         if (matcher) {
             go(matcher, req, res, next);
         } else {
