@@ -3,7 +3,8 @@ module.exports = function invokeHandler() {
         var route = req.route;
         var handler;
 
-        if (route && (handler = route.config.handler)) {
+        if (route && (handler = route.config._handler)) {
+
             var params = route.params;
             
             if (params) {
@@ -13,7 +14,7 @@ module.exports = function invokeHandler() {
                 }
             }
 
-            handler(req, res);
+            handler(req, res, next);
         } else {
             next();
         }

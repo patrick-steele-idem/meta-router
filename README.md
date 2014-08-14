@@ -22,6 +22,15 @@ The basic usage is shown below:
 app.use(require('meta-router/middleware').match([
     {
         "path": "GET /users/:user",
+        "middleware": [ // Any number of middleware functions to use for this route (called right before handler)
+            function(req, res, next) {
+                if (isNotLoggedIn(req)) {
+                    res.status(401).end('Not authorized');
+                } else {
+                    next();
+                }
+            }
+        ],
         "handler": function(req, res) {
             res.end('Hello user: ' + req.params.user);
         },
@@ -74,8 +83,15 @@ The `routes` argument can either be an `Array` of routes or a path to a JSON rou
         "handler": function(req, res) { // Route handler function
             ...
         }, // Route handler function
-        "middleware": [  // Route-specific middleware to run right before the handler (NOTE: not yet implemented)
-            ...
+        "middleware": [  // Route-specific middleware to run right before the handler
+            function foo(req, res, next) {
+                // ...
+                next();
+            },
+            function bar(req, res, next) {
+                // ...
+                next();
+            }
         ],
         // Any additional metadata to associate with this route: (optional)
         "foo": "bar",
@@ -110,12 +126,19 @@ Then in `routes.json`:
 [
     {
         "path": "GET /users/:user", // HTTP method and path
-        "handler": "require:./path/to/user/handler/module" // Path to a module that exports a route handler function
-        },
+        "handler": "require:./path/to/user/handler/module", // Path to a module that exports a route handler function
         "middleware": [  // Route-specific middleware to run right before the handler (optional)
-            "require:./path/to/some/middleware/module" // Path to a module that exports a route handler function
+            "require:foo", // Path to a module that exports a route handler function
+            {
+                "factory": "require:bar",
+                "method": "baz" // Optional name of a property name to lookup the actual factory
+                "arguments": [  // Optional arguments to use when calling the factory function
+                    "hello",
+                    "world"
+                ]
+            }
         ],
-        // Any additional metadata to associate with this route: (optional)
+        // Any additional metadata to associate with this route (optional): 
         "foo": "bar"
     },
     ...
@@ -179,8 +202,7 @@ var match = matcher.match('/users/123');
 
 ## TODO
 
-- Add support `beforeHandler` and `afterHandler` functions for each route
-- Add support for route specific middleware
+- Add support for `beforeHandler` and `afterHandler` functions for each route
 
 ## Maintainers
 

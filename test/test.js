@@ -151,6 +151,62 @@ describe('meta-router' , function() {
                         handler: function(req, res) {
                             res.end('User profile picture updated!');
                         }
+                    },
+                    {
+                        path: 'GET /middleware/foo',
+                        middleware: [
+                            function foo(req, res, next) {
+                                req.foo = true;
+                                next();
+                            },
+                            function bar(req, res, next) {
+                                req.bar = true;
+                                next();
+                            }
+                        ],
+                        handler: function handler(req, res) {
+                            res.status(200).send({
+                                foo: req.foo,
+                                bar: req.bar
+                            });
+                        }
+                    },
+                    {
+                        path: 'GET /middleware/bar',
+                        middleware: [
+                            {
+                                factory: function(arg) {
+                                    return function(req, res, next) {
+                                        req[arg] = true;
+                                        next();
+                                    };
+                                },
+                                arguments: ['factory1']
+                            },
+                            {
+                                factory: {
+                                    baz: function(arg) {
+                                        return function(req, res, next) {
+                                            req[arg] = true;
+                                            next();
+                                        };
+                                    }
+                                },
+                                method: 'baz',
+                                arguments: ['factory2']
+                            },
+                            function bar(req, res, next) {
+                                req.bar = true;
+                                next();
+                            }
+                        ],
+                        handler: function handler(req, res) {
+                            res.status(200).send({
+                                factory1: req.factory1,
+                                factory2: req.factory2,
+                                bar: req.bar
+                            });
+                        }
                     }
                 ]));
 
@@ -162,12 +218,12 @@ describe('meta-router' , function() {
             app.use(metaRouterMiddleware.invokeHandler());
 
             app.use(function(req, res, next){
-              res.send(404, 'Not Found');
+              res.status(404).end('Not Found');
             });
 
             app.use(function(err, req, res, next){
               console.error(err.stack);
-              res.send(500, 'Server error');
+              res.status(500).end('Server error');
             });
 
             server = http.createServer(app);
@@ -195,8 +251,37 @@ describe('meta-router' , function() {
 
                 done();
             });
+        });
 
-            
+        it('should support route-specific middleware (non-factory function)', function(done) {
+            jsonRequest('/middleware/foo', 'GET', function(err, response, result) {
+                if (err) {
+                    return done(err);
+                }
+
+                expect(result).to.deep.equal({
+                    foo: true,
+                    bar: true
+                });
+
+                done();
+            });
+        });
+
+        it('should support route-specific middleware (factory function)', function(done) {
+            jsonRequest('/middleware/bar', 'GET', function(err, response, result) {
+                if (err) {
+                    return done(err);
+                }
+
+                expect(result).to.deep.equal({
+                    factory1: true,
+                    factory2: true,
+                    bar: true
+                });
+
+                done();
+            });
         });
     });
 
