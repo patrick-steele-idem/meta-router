@@ -1,9 +1,62 @@
 meta-router
 =============
 
-This simple, declarative URL router provides Express middleware that can be used to associate metadata with a route. In addition, this module allows an incoming request to be matched to a route at the beginning of the request and allows the handling of the request to be deferred to later in the request. This is helpful in many applications, because intermediate middleware can use the metadata associated with the matched route to conditionally apply security checks, tracking, additional debugging, etc. 
+This simple, declarative URL router provides Express middleware that can be used to associate metadata with a route. In addition, this module allows an incoming request to be matched to a route at the beginning of the request and allows the handling of the request to be deferred to later in the request. This is helpful in many applications, because intermediate middleware can use the metadata associated with the matched route to conditionally apply security checks, tracking, additional debugging, etc.
 
 Internally, this module utilizes the same module used by Express to parse and match URLs—thus providing an easy transition from the builtin Express router to this router. The router also exposes an API that can be used independent of Express to match a path to route.
+
+# Example
+
+Let's say that you want to register authentication middleware for an application, but only a few of the routes actually require authentication. One option is to register the route-specific authentication middleware for each route using code similar to the following:
+
+```javascript
+var authMiddleware = require('my-auth-middleware');
+app.get('/account', authMiddleware({ redirect: true}), require('./pages/account'));
+```
+
+While the above code will work as expected, it has a few drawbacks. The extra route-specific middleware adds clutter and the resulting code is not declarative.
+
+To solve these problems, let's move our routes to a JSON file:
+
+```json
+[
+    {
+        "path": "GET /account",
+        "handler": "require:./pages/account",
+        "security": {
+            "authenticationRequired": true,
+            "redirect": true
+        }
+    }
+]
+```
+
+By itself, the "security" metadata for the declared route will have no impact. To enforce authentication we can change the implementation of `my-auth-middleware` to be similar to the following:
+
+```javascript
+module.exports = function(req, res, next) {
+    var routeConfig = req.route && req.route.config;
+    if (routeConfig.security && routeConfig.security.authenticationRequired) {
+        if (isUserAuthenticated(req)) {
+            next();
+        } else {
+            // Handle un-authenticated user...
+        }
+    } else {
+        // Route has no security policy... just continue on...
+        next();
+    }
+}
+```
+
+Finally, to tie everything together we need to register the following middleware (order matters):
+
+```javascript
+app.use(require('meta-router/middleware').match("routes.json")); // Match the incoming request to a route
+app.use(require('my-auth-middleware'));                          // Apply security (if applicable)
+app.use(require('meta-router/middleware').invokeHandler());      // Invoke the page handler (if applicable)
+```
+
 
 # Installation
 
@@ -138,7 +191,7 @@ Then in `routes.json`:
                 ]
             }
         ],
-        // Any additional metadata to associate with this route (optional): 
+        // Any additional metadata to associate with this route (optional):
         "foo": "bar"
     },
     ...
@@ -220,4 +273,3 @@ npm test
 ## License
 
 ISC
-
