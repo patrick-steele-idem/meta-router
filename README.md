@@ -52,9 +52,14 @@ module.exports = function(req, res, next) {
 Finally, to tie everything together we need to register the following middleware (order matters):
 
 ```javascript
-app.use(require('meta-router/middleware').match("routes.json")); // Match the incoming request to a route
-app.use(require('my-auth-middleware'));                          // Apply security (if applicable)
-app.use(require('meta-router/middleware').invokeHandler());      // Invoke the page handler (if applicable)
+// Match the incoming request to a route:
+app.use(require('meta-router/middleware').match("routes.json"));
+
+// Apply security (if applicable)
+app.use(require('my-auth-middleware'));
+
+// Invoke the page handler (if applicable)
+app.use(require('meta-router/middleware').invokeHandler());
 ```
 
 
