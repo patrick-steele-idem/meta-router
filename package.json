@@ -1,6 +1,5 @@
 {
     "name": "meta-router",
-    "version": "1.0.7",
     "description": "Declarative URL router for Express that provides support for associating metadata with a route.",
     "main": "lib/index.js",
     "scripts": {
@@ -37,5 +36,6 @@
         "jshint": "^2.5.2",
         "mocha": "^1.21.3",
         "request": "^2.39.0"
-    }
+    },
+    "version": "1.0.8"
 }
