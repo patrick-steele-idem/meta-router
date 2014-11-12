@@ -1,0 +1,5 @@
+{
+    "browser": {
+        "./routers-loader": "./routes-loader-browser"
+    }
+}
