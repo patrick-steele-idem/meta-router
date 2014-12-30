@@ -3,5 +3,9 @@
         "path": "GET /users/:user", // HTTP method and path
         "handler": "require:./user", // Path to a module that exports a route handler function
         "foo": "bar"// Any additional metadata to associate with this route: (optional)
+    },
+    {
+        "path": "GET /foo", // HTTP method and path
+        "handler": "require:./user#foo" // Path to a module with a method that exports a route handler function
     }
 ]

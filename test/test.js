@@ -86,7 +86,7 @@ describe('meta-router' , function() {
             expect(match.config.handler).to.be.a('function');
             expect(match.config.methods).to.deep.equal(['POST']);
 
-            
+
         });
 
         it('should allow method to be optional', function() {
@@ -338,7 +338,7 @@ describe('meta-router' , function() {
 
             var metaRouterMiddleware = require('../middleware');
             app = express();
-            
+
             app.use(metaRouterMiddleware.match([
                     {
                         path: 'GET /users/:user',
@@ -415,7 +415,7 @@ describe('meta-router' , function() {
                 done();
             });
 
-            
+
         });
     });
 
@@ -468,8 +468,20 @@ describe('meta-router' , function() {
 
                 done();
             });
+        });
 
-            
+        it('should match a route loaded from a json file with a method', function(done) {
+            jsonRequest('/foo', 'GET', function(err, response, result) {
+                if (err) {
+                    return done(err);
+                }
+
+                expect(result).to.deep.equal({
+                    message: 'foo'
+                });
+
+                done();
+            });
         });
     });
 

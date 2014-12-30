@@ -180,7 +180,7 @@ app.use(require('meta-router/middleware').match("routes.json"));
 
 Then in `routes.json`:
 
-```js
+```javascript
 [
     {
         "path": "GET /users/:user", // HTTP method and path
@@ -207,6 +207,7 @@ A few things to note when using a JSON routes file:
 
 * JavaScript comments are allowed in the JSON configuration file (they are stripped out before parsing)
 * [shortstop](https://github.com/krakenjs/shortstop) is used to preprocess the loaded JSON file to resolve handler functions and middleware. All of the handlers provided by [shortstop-handlers](https://github.com/krakenjs/shortstop-handlers) are registered.
+* The `require:` handler supports resolving to a module method using the following syntax: `"require:./some-module#someMethod"`
 
 ## invokeHandler() middleware
 
