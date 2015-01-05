@@ -259,6 +259,36 @@ var match = matcher.match('/users/123');
 // match.config.path === '/users/:user'
 ```
 
+## getRoutes()
+
+Returns summary information for the routes matchable by meta-router.
+Returned information is of the form:
+
+```json
+[
+  {"path": "path of the route",
+   "methods": ["list of methods on the route"]}
+]
+```
+For example,
+
+```json
+[
+  {
+    "path":"/keywords",
+    "methods":[ "GET" ]
+  },
+  {
+    "path":"/update",
+    "methods":[ "GET", "POST" ]
+  },
+  {
+    "path":"/",
+    "methods":[ "GET" ]
+  }
+]
+```
+
 ## TODO
 
 - Add support for `beforeHandler` and `afterHandler` functions for each route
