@@ -7,7 +7,6 @@ var request = require('request');
 var express = require('express');
 var http = require('http');
 var nodePath = require('path');
-var getRoutes = require('../lib/index.js').getRoutes;
 
 var app;
 var server;
@@ -90,53 +89,53 @@ describe('meta-router' , function() {
         });
 
         it('should provide routes correctly', function() {
-          var metaRouter = require('../');
-          var matcher = metaRouter.buildMatcher([
-            {
-              "path": "GET /users/:user",
-              "handler": function(req, res) {
-                res.end('Hello user: ' + req.params.user);
-              },
-              // Arbitrary metadata:
-              "foo": "bar"
-            },
-            {
-              path: "POST /users/:user/picture",
-              handler: function(req, res) {
-                res.end('User profile picture updated!');
-              }
-            },
-            {
-              path: "PATCH,POST /more",
-              handler: function(req, res) {
-                res.end('User more things updated');
-              }
-            },
-            {
-              path: "ALL /others",
-              handler: function(req, res) {
-                res.end('Users support ALL');
-              }
-            }
+            var metaRouter = require('../');
+            var matcher = metaRouter.buildMatcher([
+                {
+                    "path": "GET /users/:user",
+                    "handler": function(req, res) {
+                        res.end('Hello user: ' + req.params.user);
+                    },
+                    // Arbitrary metadata:
+                    "foo": "bar"
+                },
+                {
+                    path: "POST /users/:user/picture",
+                    handler: function(req, res) {
+                        res.end('User profile picture updated!');
+                    }
+                },
+                {
+                    path: "PATCH,POST /more",
+                    handler: function(req, res) {
+                        res.end('User more things updated');
+                    }
+                },
+                {
+                    path: "ALL /others",
+                    handler: function(req, res) {
+                        res.end('Users support ALL');
+                    }
+                }
             ]);
 
-            var routeInfo = getRoutes();
-            expect(routeInfo.length).to.equal(4);
-            expect(routeInfo[0].path).to.equal('/users/:user');
-            expect(routeInfo[1].path).to.equal('/users/:user/picture');
-            expect(routeInfo[2].path).to.equal('/more');
-            expect(routeInfo[3].path).to.equal('/others');
-            expect(routeInfo[0].methods.length).to.equal(1);
-            expect(routeInfo[1].methods.length).to.equal(1);
-            expect(routeInfo[2].methods.length).to.equal(2);
-            expect(routeInfo[3].methods.length).to.equal(1);
-            expect(routeInfo[0].methods[0]).to.equal('GET');
-            expect(routeInfo[1].methods[0]).to.equal('POST');
-            expect(routeInfo[2].methods[0]).to.equal('PATCH');
-            expect(routeInfo[2].methods[1]).to.equal('POST');
-            expect(routeInfo[3].methods[0]).to.equal('*');
+            var routes = matcher.routes;
+            expect(routes.length).to.equal(4);
+            expect(routes[0].path).to.equal('/users/:user');
+            expect(routes[1].path).to.equal('/users/:user/picture');
+            expect(routes[2].path).to.equal('/more');
+            expect(routes[3].path).to.equal('/others');
+            expect(routes[0].methods.length).to.equal(1);
+            expect(routes[1].methods.length).to.equal(1);
+            expect(routes[2].methods.length).to.equal(2);
+            expect(routes[3].methods.length).to.equal(1);
+            expect(routes[0].methods[0]).to.equal('GET');
+            expect(routes[1].methods[0]).to.equal('POST');
+            expect(routes[2].methods[0]).to.equal('PATCH');
+            expect(routes[2].methods[1]).to.equal('POST');
+            expect(routes[3].methods[0]).to.equal('*');
 
-          });
+        });
 
         it('should allow method to be optional', function() {
             var metaRouter = require('../');

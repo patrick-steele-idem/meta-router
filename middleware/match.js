@@ -19,6 +19,9 @@ module.exports = function matchFactory(routes) {
             matcher = metaRouter.buildMatcher(routes);
             matcherDataHolder.resolve(matcher);
         });
+    } else if (typeof routes.match === 'function') {
+        // The provided routes are already a matcher
+        matcher = routes;
     } else {
         matcher = metaRouter.buildMatcher(routes);
     }
