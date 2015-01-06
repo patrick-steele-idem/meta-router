@@ -137,6 +137,20 @@ describe('meta-router' , function() {
 
         });
 
+        it('should allow buildMatcher to be called with a path and callback', function(done) {
+            var metaRouter = require('../');
+            metaRouter.buildMatcher(nodePath.join(__dirname, 'routes.json'), function(err, matcher) {
+                if (err) {
+                    return done(err);
+                }
+
+                var match = matcher.match('/users/123', 'GET');
+                expect(match != null).to.equal(true);
+                expect(match.params).to.deep.equal({ user: '123' });
+                done();
+            });
+        });
+
         it('should allow method to be optional', function() {
             var metaRouter = require('../');
             var matcher = metaRouter.buildMatcher([
