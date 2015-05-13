@@ -269,7 +269,13 @@ describe('meta-router' , function() {
                                 bar: req.bar
                             });
                         }
-                    }
+                    },
+                    {
+                        path: 'GET /error',
+                        handler: function(req, res, next) {
+                            next(new Error('Test error'));
+                        }
+                    },
                 ]));
 
             app.use(function(req, res, next) {
@@ -341,6 +347,18 @@ describe('meta-router' , function() {
                     factory2: true,
                     bar: true
                 });
+
+                done();
+            });
+        });
+
+        it('should handle error and generate 500', function(done) {
+            jsonRequest('/error', 'GET', function(err, response, result) {
+                if (err) {
+                    return done(err);
+                }
+
+                expect(response.statusCode).to.equal(500);
 
                 done();
             });
