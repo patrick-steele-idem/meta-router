@@ -1,21 +1,21 @@
 var metaRouter = require('../');
-var DataHolder = require('raptor-async/DataHolder');
+var AsyncValue = require('raptor-async/AsyncValue');
 var nodePath = require('path');
 
 module.exports = function matchFactory(routes) {
     var matcher;
-    var matcherDataHolder;
+    var matcherAsyncValue;
 
     if (typeof routes === 'string') {
         routes = nodePath.resolve(process.cwd(), routes);
-        matcherDataHolder = new DataHolder();
+        matcherAsyncValue = new AsyncValue();
 
         metaRouter.buildMatcher(routes, function(err, matcher) {
             if (err) {
-                return matcherDataHolder.reject(err);
+                return matcherAsyncValue.reject(err);
             }
 
-            matcherDataHolder.resolve(matcher);
+            matcherAsyncValue.resolve(matcher);
         });
     } else if (typeof routes.match === 'function') {
         // The provided routes are already a matcher
@@ -37,7 +37,7 @@ module.exports = function matchFactory(routes) {
         if (matcher) {
             go(matcher, req, res, next);
         } else {
-            matcherDataHolder.done(function(err, matcher) {
+            matcherAsyncValue.done(function(err, matcher) {
                 if (err) {
                     return next(err);
                 }
