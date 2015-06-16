@@ -106,6 +106,12 @@ describe('matcher' , function() {
             var match = matcher.match('/users/123', 'GET');
             expect(match != null).to.equal(true);
             expect(match.params).to.deep.equal({ user: '123' });
+
+            match = matcher.match('/bar', 'GET');
+            expect(match != null).to.equal(true);
+            expect(match.config.handler != null).to.equal(true);
+            expect(match.config.handler).to.equal(require('./fixtures/user').bar);
+
             done();
         });
     });

@@ -4,14 +4,26 @@ module.exports = function userHandler(req, res) {
     });
 };
 
+module.exports.routeMeta = {
+    meta1: true
+};
+
 module.exports.foo = function foo(req, res) {
     res.send({
         message: 'foo'
     });
 };
 
-module.exports.bar = function foo(req, res) {
+module.exports.foo.routeMeta = {
+    meta2: true
+};
+
+module.exports.bar = function bar(req, res) {
     res.send({
         message: 'bar'
     });
+};
+
+module.exports.bar.routeMeta = {
+    meta3: true
 };

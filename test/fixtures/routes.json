@@ -7,5 +7,9 @@
     {
         "path": "GET /foo", // HTTP method and path
         "handler": "require:./user#foo" // Path to a module with a method that exports a route handler function
+    },
+    {
+        "path": "GET /bar", // HTTP method and path
+        "handler": "./user#bar" // Path to a module with a method that exports a route handler function
     }
 ]

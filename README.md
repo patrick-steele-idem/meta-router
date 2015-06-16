@@ -11,7 +11,9 @@ Let's say that you want to register authentication middleware for an application
 
 ```javascript
 var authMiddleware = require('my-auth-middleware');
-app.get('/account', authMiddleware({ redirect: true}), require('./pages/account'));
+app.get('/account' /* Route path */,
+    authMiddleware({ redirect: true}) /* Route-specific middleware */,
+    require('./pages/account') /* Handler: function(req, res, next) { ... } */);
 ```
 
 While the above code will work as expected, it has a few drawbacks. The extra route-specific middleware adds clutter and the resulting code is not declarative.
@@ -21,8 +23,7 @@ To solve these problems, let's move our routes to a JSON file:
 ```json
 [
     {
-        "path": "GET /account",
-        "handler": "require:./pages/account",
+        "route": "GET /account => ./pages/account",
         "security": {
             "authenticationRequired": true,
             "redirect": true
@@ -53,12 +54,12 @@ Finally, to tie everything together we need to register the following middleware
 
 ```javascript
 // Match the incoming request to a route:
-app.use(require('meta-router/middleware').match("routes.json"));
+app.use(require('meta-router/middleware').match("/path/to/routes.json"));
 
 // Apply security (if applicable)
 app.use(require('my-auth-middleware'));
 
-// Invoke the page handler (if applicable)
+// Invoke the route handler (if applicable)
 app.use(require('meta-router/middleware').invokeHandler());
 ```
 
@@ -72,15 +73,118 @@ npm install meta-router --save
 
 # Basic Usage
 
-The basic usage is shown below:
+
+## Using a JSON routes file
+
+___routes.json:___
+
+```javascript
+[
+
+    "GET /users/:user => ./user",
+    "GET /login => ./user#login",
+    "GET /logout => ./user#logout",
+    "POST /users/:user/picture => ./user#uploadPicture"
+]
+```
+
+Each route should be of the following format:
+
+`<HTTP_METHOD> <PATH> => <HANDLER_MODULE_PATH[#<HANDLER_METHOD>]>`
+
+- The `HTTP_METHOD` should be `GET`, `POST`, etc.
+- The `PATH` should be an Express-style route path
+- The `HANDLER_MODULE_PATH` should be the relative path to a Node.js JavaScript module
+- The optional `HANDLER_METHOD` should be the name of a method on the handler module
+
+
+The code to register the `meta-router` middleware is shown below:
+
+```javascript
+// Match the incoming request to a route:
+app.use(require('meta-router/middleware').match("/path/to/routes.json"));
+
+// Intermediate middleware:
+app.use(require('my-auth-middleware'));
+
+// Finally, invoke the route handler (if applicable)
+app.use(require('meta-router/middleware').invokeHandler());
+```
+
+### Route metadata
+
+Route metadata can either be inlined in the JSON routes file or it can be attached to the handler as shown below:
+
+___Option 1) Route metadata in JSON file:___
+
+```json
+[
+
+    {
+        "route": "GET /users/:user => ./user",
+        "security": {
+            "authenticationRequired": true,
+            "redirect": true
+        }
+    },
+    ...
+]
+```
+
+___Option 2) Attach route metadata to handler function:___
+
+___./user.js___
+
+```javascript
+function userHandler(req, res, next) {
+    // ...
+}
+
+userHandler.routeMeta = {
+    security: {
+        authenticationRequired: true,
+        redirect: true
+    }
+}
+
+// You can also optionally attach middleware to the route:
+userHandler.routeMiddleware = [
+    function (req, res, next) {
+        // ...
+    },
+    // ...
+]
+
+module.exports = handler;
+```
+
+### Route handler methods
+
+When using a route handler method (e.g. `./user#login`), the JavaScript code to export the `login` handler method will be similar to the following:
+
+___`./user.js`___
+
+```javascript
+
+exports.login = function (req, res, next) {
+    // ...
+};
+
+exports.login.routeMeta = { /* ... */ }; // Optional route metadata
+exports.login.routeMiddleware = { /* ... */ }; // Optional route-specific middleware
+```
+
+## Declaring routes in JavaScript
+
+If you don't like JSON Files, you can also choose to configure the routes in your JavaScript code that registers the `match` middleware as shown below:
 
 ```javascript
 
 // Match the incoming request to one of the provided routes
 app.use(require('meta-router/middleware').match([
     {
-        "path": "GET /users/:user",
-        "middleware": [ // Any number of middleware functions to use for this route (called right before handler)
+        path: 'GET /users/:user',
+        middleware: [ // Any number of middleware functions to use for this route (called right before handler)
             function(req, res, next) {
                 if (isNotLoggedIn(req)) {
                     res.status(401).end('Not authorized');
@@ -89,38 +193,42 @@ app.use(require('meta-router/middleware').match([
                 }
             }
         ],
-        "handler": function(req, res) {
+        handler: function(req, res) {
             res.end('Hello user: ' + req.params.user);
         },
-        "foo": "bar" // <-- Arbitrary metadata
+        foo: 'bar' // <-- Arbitrary metadata
     },
     {
-        "path": "POST /users/:user/picture",
-        "handler": function(req, res) {
+        path: 'POST /users/:user/picture',
+        handler: function(req, res) {
             saveProfilePicture(req);
             res.end('User profile picture updated!');
         }
     }
 ]);
 
-// Use information from the matched route
-app.use(function(req, res, next) {
-    var route = req.route;
-    if (route) {
-        console.log('Route params: ', route.params);     // e.g. { user: 'John' }
-        console.log('Route path: ', route.path);     // e.g. "/users/123"
-        console.log('Route path: ', route.config.path);     // e.g. "/users/:user"
-        console.log('Route methods: ', route.config.methods); // e.g. ['GET']
-        console.log('Route foo: ', route.config.foo);       // e.g. "bar"
-    }
-    next();
-});
-
 // Invoke the route handler (if available) and end the response:
 app.use(require('meta-router/middleware').invokeHandler());
 ```
 
-The API is described in more detail in the next section.
+## Using metadata associated with a matched route
+
+After the `match` middleware runs, the matched route information is stored in the `req.route` property. The information associated with matched route can be read as shown below:
+
+```javascript
+// Use information from the matched route
+app.use(function(req, res, next) {
+    var route = req.route;
+    if (route) {
+        console.log('Route params: ',  route.params);     // e.g. { user: 'John' }
+        console.log('Route path: ',    route.path);     // e.g. "/users/123"
+        console.log('Route path: ',    route.config.path);     // e.g. "/users/:user"
+        console.log('Route methods: ', route.config.methods); // e.g. ['GET']
+        console.log('Route meta: ',    route.config.foo);       // e.g. "bar"
+    }
+    next();
+});
+```
 
 # API
 
@@ -137,11 +245,11 @@ The `routes` argument can either be an `Array` of routes or a path to a JSON rou
 ```javascript
 [
     {
-        "path": "GET /users/:user", // HTTP method and path
-        "handler": function(req, res) { // Route handler function
+        path: 'GET /users/:user', // HTTP method and path
+        handler: function(req, res) { // Route handler function
             ...
         }, // Route handler function
-        "middleware": [  // Route-specific middleware to run right before the handler
+        middleware: [  // Route-specific middleware to run right before the handler
             function foo(req, res, next) {
                 // ...
                 next();
@@ -152,19 +260,19 @@ The `routes` argument can either be an `Array` of routes or a path to a JSON rou
             }
         ],
         // Any additional metadata to associate with this route: (optional)
-        "foo": "bar",
+        foo: 'bar',
     },
     // Alternatively, multiple HTTP methods can be matched
     {
-        "methods": ["GET", "POST"]
-        "path": "/foo", // HTTP method and path
-        "handler": ...,
+        methods: ['GET', 'POST']
+        path: '/foo', // HTTP method and path
+        handler: ...,
         ...
     },
     // Or to match all HTTP methods, the method can be omitted altogether
     {
-        "path": "/bar", // HTTP method and path
-        "handler": ...,
+        path: '/bar', // HTTP method and path
+        handler: ...,
         ...
     },
     // Additional routes:
@@ -175,16 +283,15 @@ The `routes` argument can either be an `Array` of routes or a path to a JSON rou
 If a `String` is passed to the `match()` middleware function then it is treated as a path to a JSON routes file. For example:
 
 ```javascript
-app.use(require('meta-router/middleware').match("routes.json"));
+app.use(require('meta-router/middleware').match(require.resolve('./routes.json'));
 ```
 
-Then in `routes.json`:
+Then in `./routes.json`:
 
 ```javascript
 [
     {
-        "path": "GET /users/:user", // HTTP method and path
-        "handler": "require:./path/to/user/handler/module", // Path to a module that exports a route handler function
+        "route": "GET /users/:user => ./path/to/user/handler/module", // HTTP method, path and handler
         "middleware": [  // Route-specific middleware to run right before the handler (optional)
             "require:foo", // Path to a module that exports a route handler function
             {
@@ -292,6 +399,10 @@ For example,
 ## TODO
 
 - Add support for `beforeHandler` and `afterHandler` functions for each route
+
+## Changelog
+
+See [CHANGELOG.md](./CHANGELOG.md)
 
 ## Maintainers
 

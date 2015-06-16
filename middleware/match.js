@@ -39,7 +39,9 @@ module.exports = function matchFactory(routes) {
         } else {
             matcherAsyncValue.done(function(err, matcher) {
                 if (err) {
-                    return next(err);
+                    // Crash the process via an uncaught exception since
+                    // the routes failed to load
+                    throw err;
                 }
 
                 go(matcher, req, res, next);
