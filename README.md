@@ -155,7 +155,7 @@ userHandler.routeMiddleware = [
     // ...
 ]
 
-module.exports = handler;
+module.exports = userHandler;
 ```
 
 ### Route handler methods
