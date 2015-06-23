@@ -1,6 +1,41 @@
 Changelog
 =========
 
+# 3.x
+
+## 3.0.x
+
+### 3.0.0
+
+- The options passed to [path-to-regexp](https://github.com/component/path-to-regexp) must now provided via the `matchOptions` property of a route configuration as shown below:
+
+```json
+[
+
+    {
+        "route": "GET /users/:user => ./user",
+        "security": {
+            "authenticationRequired": true,
+            "redirect": true
+        },
+        "matchOptions": {
+            "sensitive": false,
+            "strict": false,
+            "end": true
+        }
+    },
+    ...
+]
+```
+
+Supported properties for `matchOptions`:
+
+- **sensitive** When `true` the route will be case sensitive. (default: `false`)
+- **strict** When `false` the trailing slash is optional. (default: `false`)
+- **end** When `false` the path will match at the beginning. (default: `true`)
+
+Previously, the match options could be provided via top-level `caseSensitive`, `strict` and `end` properties. Those properties are no longer supported.
+
 # 2.x
 
 ## 2.1.x

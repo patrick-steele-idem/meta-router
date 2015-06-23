@@ -230,6 +230,35 @@ app.use(function(req, res, next) {
 });
 ```
 
+## Match options
+
+A special `matchOptions` property can be included with route metadata to control how the path matching regular expression is generated using [path-to-regexp](https://github.com/component/path-to-regexp) as shown below:
+
+```json
+[
+
+    {
+        "route": "GET /users/:user => ./user",
+        "security": {
+            "authenticationRequired": true,
+            "redirect": true
+        },
+        "matchOptions": {
+            "sensitive": false,
+            "strict": false,
+            "end": true
+        }
+    },
+    ...
+]
+```
+
+Supported properties for `matchOptions`:
+
+- **sensitive** When `true` the route will be case sensitive. (default: `false`)
+- **strict** When `false` the trailing slash is optional. (default: `false`)
+- **end** When `false` the path will match at the beginning. (default: `true`)
+
 # API
 
 ## match() middleware

@@ -47,6 +47,47 @@ describe('matcher' , function() {
 
     });
 
+    it('should allow exact matches', function() {
+        var metaRouter = require('../');
+        var matcher = metaRouter.buildMatcher([
+            {
+                "path": "GET /exact",
+                "handler": function(req, res) {
+                    res.end('Hello user: ' + req.params.user);
+                },
+                "foo": "bar"
+            }
+        ]);
+
+        var match = matcher.match('/exact', 'GET');
+        expect(match != null).to.equal(true);
+
+        match = matcher.match('/exact/not', 'GET');
+        expect(match == null).to.equal(true);
+    });
+
+    it('should allow start matches', function() {
+        var metaRouter = require('../');
+        var matcher = metaRouter.buildMatcher([
+            {
+                "path": "GET /first",
+                "handler": function(req, res) {
+                    res.end('Hello user: ' + req.params.user);
+                },
+                "foo": "bar",
+                matchOptions: {
+                    end: false
+                }
+            }
+        ]);
+
+        var match = matcher.match('/first', 'GET');
+        expect(match != null).to.equal(true);
+
+        match = matcher.match('/first/second', 'GET');
+        expect(match != null).to.equal(true);
+    });
+
     it('should provide routes correctly', function() {
         var metaRouter = require('../');
         var matcher = metaRouter.buildMatcher([
