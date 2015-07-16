@@ -125,15 +125,17 @@ describe('matcher' , function() {
         expect(routes[1].path).to.equal('/users/:user/picture');
         expect(routes[2].path).to.equal('/more');
         expect(routes[3].path).to.equal('/others');
-        expect(routes[0].methods.length).to.equal(1);
-        expect(routes[1].methods.length).to.equal(1);
-        expect(routes[2].methods.length).to.equal(2);
-        expect(routes[3].methods.length).to.equal(1);
-        expect(routes[0].methods[0]).to.equal('GET');
-        expect(routes[1].methods[0]).to.equal('POST');
-        expect(routes[2].methods[0]).to.equal('PATCH');
-        expect(routes[2].methods[1]).to.equal('POST');
-        expect(routes[3].methods[0]).to.equal('*');
+
+
+        expect(routes[0].config.methods.length).to.equal(1);
+        expect(routes[1].config.methods.length).to.equal(1);
+        expect(routes[2].config.methods.length).to.equal(2);
+        expect(routes[3].config.methods.length).to.equal(1);
+        expect(routes[0].config.methods[0]).to.equal('GET');
+        expect(routes[1].config.methods[0]).to.equal('POST');
+        expect(routes[2].config.methods[0]).to.equal('PATCH');
+        expect(routes[2].config.methods[1]).to.equal('POST');
+        expect(routes[3].config.methods[0]).to.equal('*');
 
     });
 
@@ -193,5 +195,38 @@ describe('matcher' , function() {
         expect(match.params).to.deep.equal({ user: '123' });
         expect(match.config.path).to.equal('/users/:user/picture');
         expect(match.config.handler).to.be.a('function');
+    });
+
+    it('should match a PUT route correctly', function() {
+        var metaRouter = require('../');
+        var matcher = metaRouter.buildMatcher([
+            {
+                "path": "PUT /users/:user",
+                "handler": function(req, res) {
+                    res.end('Hello user: ' + req.params.user);
+                },
+                // Arbitrary metadata:
+                "foo": "bar"
+            },
+            {
+                path: "POST /users/:user/picture",
+                handler: function(req, res) {
+                    res.end('User profile picture updated!');
+                }
+            }
+        ]);
+
+        var match = matcher.match('/users/123', 'GET');
+        expect(match == null).to.equal(true);
+
+
+        match = matcher.match('/users/123', 'PUT');
+        expect(match != null).to.equal(true);
+        expect(match.path).to.equal('/users/123');
+        expect(match.params).to.deep.equal({ user: '123' });
+        expect(match.config.path).to.equal('/users/:user');
+        expect(match.config.handler).to.be.a('function');
+        expect(match.config.methods).to.deep.equal(['PUT']);
+        expect(match.config.foo).to.equal('bar');
     });
 });
