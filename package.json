@@ -1,42 +1,42 @@
 {
-  "name": "meta-router",
-  "description": "Declarative URL router for Express that provides support for associating metadata with a route.",
-  "main": "lib/index.js",
-  "scripts": {
-    "test": "node_modules/.bin/mocha --ui bdd --reporter spec ./test && node_modules/.bin/jshint lib/ middleware/"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/patrick-steele-idem/meta-router.git"
-  },
-  "keywords": [
-    "router",
-    "express",
-    "metadata",
-    "server",
-    "http"
-  ],
-  "author": "Patrick Steele-Idem <pnidem@gmail.com>",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/patrick-steele-idem/meta-router/issues"
-  },
-  "homepage": "https://github.com/patrick-steele-idem/meta-router",
-  "dependencies": {
-    "jsonminify": "^0.2.3",
-    "path-to-regexp": "^1.0.1",
-    "raptor-async": "^1.1.1",
-    "raptor-util": "^1.0.10",
-    "resolve-from": "^1.0.0",
-    "shortstop": "^1.0.1",
-    "shortstop-handlers": "^1.0.0"
-  },
-  "devDependencies": {
-    "chai": "^3.0.0",
-    "express": "^4.7.2",
-    "jshint": "^2.5.2",
-    "mocha": "^2.2.5",
-    "request": "^2.39.0"
-  },
-  "version": "3.0.0"
+    "name": "meta-router",
+    "description": "Declarative URL router for Express that provides support for associating metadata with a route.",
+    "main": "lib/index.js",
+    "scripts": {
+        "test": "node_modules/.bin/mocha --ui bdd --reporter spec ./test && node_modules/.bin/jshint lib/ middleware/"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/patrick-steele-idem/meta-router.git"
+    },
+    "keywords": [
+        "router",
+        "express",
+        "metadata",
+        "server",
+        "http"
+    ],
+    "author": "Patrick Steele-Idem <pnidem@gmail.com>",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/patrick-steele-idem/meta-router/issues"
+    },
+    "homepage": "https://github.com/patrick-steele-idem/meta-router",
+    "dependencies": {
+        "jsonminify": "^0.2.3",
+        "path-to-regexp": "^1.0.1",
+        "raptor-async": "^1.1.1",
+        "raptor-util": "^1.0.10",
+        "resolve-from": "^1.0.0",
+        "shortstop": "^1.0.1",
+        "shortstop-handlers": "^1.0.0"
+    },
+    "devDependencies": {
+        "chai": "^3.0.0",
+        "express": "^4.7.2",
+        "jshint": "^2.5.2",
+        "mocha": "^2.2.5",
+        "request": "^2.39.0"
+    },
+    "version": "3.0.1"
 }
