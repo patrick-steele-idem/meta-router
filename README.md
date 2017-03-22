@@ -1,5 +1,6 @@
 meta-router
 =============
+[![Gitter](https://badges.gitter.im/Join Chat.svg)](https://gitter.im/patrick-steele-idem/meta-router?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 This simple, declarative URL router provides Express middleware that can be used to associate metadata with a route. In addition, this module allows an incoming request to be matched to a route at the beginning of the request and allows the handling of the request to be deferred to later in the request. This is helpful in many applications, because intermediate middleware can use the metadata associated with the matched route to conditionally apply security checks, tracking, additional debugging, etc.
 
