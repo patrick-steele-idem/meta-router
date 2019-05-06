@@ -4,7 +4,7 @@ const plugin = require("babel-plugin-macros");
 const prettier = require("prettier");
 const path = require("path");
 
-describe('meta-router/macro' , function() {
+describe('meta-router/macro' , () => {
     pluginTester({
       plugin,
       babelOptions: {

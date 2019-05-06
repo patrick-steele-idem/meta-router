@@ -1,16 +1,16 @@
-var metaRouter = require('../');
-var AsyncValue = require('raptor-async/AsyncValue');
-var nodePath = require('path');
+const metaRouter = require('../');
+const AsyncValue = require('raptor-async/AsyncValue');
+const nodePath = require('path');
 
 module.exports = function matchFactory(routes) {
-    var matcher;
-    var matcherAsyncValue;
+    let matcher;
+    let matcherAsyncValue;
 
     if (typeof routes === 'string') {
         routes = nodePath.resolve(process.cwd(), routes);
         matcherAsyncValue = new AsyncValue();
 
-        metaRouter.buildMatcher(routes, function(err, matcher) {
+        metaRouter.buildMatcher(routes, (err, matcher) => {
             if (err) {
                 return matcherAsyncValue.reject(err);
             }
@@ -25,7 +25,7 @@ module.exports = function matchFactory(routes) {
     }
 
     function go(matcher, req, res, next) {
-        var match = matcher.match(req.path, req.method);
+        const match = matcher.match(req.path, req.method);
         if (match) {
             req.route = match;
         }
@@ -37,7 +37,7 @@ module.exports = function matchFactory(routes) {
         if (matcher) {
             go(matcher, req, res, next);
         } else {
-            matcherAsyncValue.done(function(err, matcher) {
+            matcherAsyncValue.done((err, matcher) => {
                 if (err) {
                     // Crash the process via an uncaught exception since
                     // the routes failed to load

@@ -1,19 +1,19 @@
-var expect = require('chai').expect;
-var request = require('request');
-var express = require('express');
-var http = require('http');
-var nodePath = require('path');
+const expect = require('chai').expect;
+const request = require('request');
+const express = require('express');
+const http = require('http');
+const nodePath = require('path');
 
-var app;
-var server;
-var port;
+let app;
+let server;
+let port;
 
 function jsonRequest(path, method, callback) {
-    var options = {
+    const options = {
         url: 'http://localhost:' + port + path,
         method: method || 'GET'
     };
-    request(options, function(err, response, body) {
+    request(options, (err, response, body) => {
         if (err) {
             return callback(err);
         }
@@ -26,17 +26,17 @@ function jsonRequest(path, method, callback) {
     });
 }
 
-describe('middleware' , function() {
+describe('middleware' , () => {
 
-    before(function(done) {
+    before((done) => {
 
-        var metaRouterMiddleware = require('../middleware');
+        const metaRouterMiddleware = require('../middleware');
         app = express();
 
         app.use(metaRouterMiddleware.match([
                 {
                     path: 'GET /users/:user',
-                    handler: function(req, res) {
+                    handler(req, res) {
                         res.send({
                             user: req.params.user,
                             foo: req.route.config.foo
@@ -46,23 +46,23 @@ describe('middleware' , function() {
                 },
                 {
                     path: 'POST /users/:user/picture',
-                    handler: function(req, res) {
+                    handler(req, res) {
                         res.end('User profile picture updated!');
                     }
                 },
                 {
                     path: 'GET /middleware/foo',
                     middleware: [
-                        function foo(req, res, next) {
+                        (req, res, next) => {
                             req.foo = true;
                             next();
                         },
-                        function bar(req, res, next) {
+                        (req, res, next) => {
                             req.bar = true;
                             next();
                         }
                     ],
-                    handler: function handler(req, res) {
+                    handler(req, res) {
                         res.status(200).send({
                             foo: req.foo,
                             bar: req.bar
@@ -73,8 +73,8 @@ describe('middleware' , function() {
                     path: 'GET /middleware/bar',
                     middleware: [
                         {
-                            factory: function(arg) {
-                                return function(req, res, next) {
+                            factory(arg) {
+                                return (req, res, next) => {
                                     req[arg] = true;
                                     next();
                                 };
@@ -83,8 +83,8 @@ describe('middleware' , function() {
                         },
                         {
                             factory: {
-                                baz: function(arg) {
-                                    return function(req, res, next) {
+                                baz(arg) {
+                                    return (req, res, next) => {
                                         req[arg] = true;
                                         next();
                                     };
@@ -93,12 +93,12 @@ describe('middleware' , function() {
                             method: 'baz',
                             arguments: ['factory2']
                         },
-                        function bar(req, res, next) {
+                        (req, res, next) => {
                             req.bar = true;
                             next();
                         }
                     ],
-                    handler: function handler(req, res) {
+                    handler(req, res) {
                         res.status(200).send({
                             factory1: req.factory1,
                             factory2: req.factory2,
@@ -108,42 +108,42 @@ describe('middleware' , function() {
                 },
                 {
                     path: 'GET /error',
-                    handler: function(req, res, next) {
+                    handler(req, res, next) {
                         next(new Error('Test error'));
                     }
                 },
             ]));
 
-        app.use(function(req, res, next) {
+        app.use((req, res, next) => {
             req.matchedRoute = req.route;
             next();
         });
 
         app.use(metaRouterMiddleware.invokeHandler());
 
-        app.use(function(req, res, next){
+        app.use((req, res, next) => {
           res.status(404).end('Not Found');
         });
 
-        app.use(function(err, req, res, next){
+        app.use((err, req, res, next) => {
           console.error(err.stack);
           res.status(500).end('Server error');
         });
 
         server = http.createServer(app);
-        server.on('listening', function() {
+        server.on('listening', () => {
             port = server.address().port;
             done();
         });
         server.listen();
     });
 
-    after(function() {
+    after(() => {
         server.close();
     });
 
-    it('should support match() and invokeHandler() middleware', function(done) {
-        jsonRequest('/users/123', 'GET', function(err, response, result) {
+    it('should support match() and invokeHandler() middleware', done => {
+        jsonRequest('/users/123', 'GET', (err, response, result) => {
             if (err) {
                 return done(err);
             }
@@ -157,8 +157,8 @@ describe('middleware' , function() {
         });
     });
 
-    it('should support route-specific middleware (non-factory function)', function(done) {
-        jsonRequest('/middleware/foo', 'GET', function(err, response, result) {
+    it('should support route-specific middleware (non-factory function)', done => {
+        jsonRequest('/middleware/foo', 'GET', (err, response, result) => {
             if (err) {
                 return done(err);
             }
@@ -172,8 +172,8 @@ describe('middleware' , function() {
         });
     });
 
-    it('should support route-specific middleware (factory function)', function(done) {
-        jsonRequest('/middleware/bar', 'GET', function(err, response, result) {
+    it('should support route-specific middleware (factory function)', done => {
+        jsonRequest('/middleware/bar', 'GET', (err, response, result) => {
             if (err) {
                 return done(err);
             }
@@ -188,8 +188,8 @@ describe('middleware' , function() {
         });
     });
 
-    it('should handle error and generate 500', function(done) {
-        jsonRequest('/error', 'GET', function(err, response, result) {
+    it('should handle error and generate 500', done => {
+        jsonRequest('/error', 'GET', (err, response, result) => {
             if (err) {
                 return done(err);
             }
@@ -201,17 +201,18 @@ describe('middleware' , function() {
     });
 });
 
-describe('middleware with subapps' , function() {
+describe('middleware with subapps' , () => {
 
-    before(function(done) {
+    before(done => {
+        const metaRouterMiddleware = require('../middleware');
 
         function apiApp() {
-            var app = express();
+            const app = express();
 
             app.use(metaRouterMiddleware.match([
                     {
                         path: 'GET /hello/:world',
-                        handler: function(req, res) {
+                        handler(req, res) {
                             res.send({
                                 apiHello: req.params.world
                             });
@@ -220,7 +221,7 @@ describe('middleware with subapps' , function() {
                     }
                 ]));
 
-            app.get('/foo/:bar', function(req, res) {
+            app.get('/foo/:bar', (req, res) => {
                 res.send({
                     apiBar: req.params.bar
                 });
@@ -231,13 +232,12 @@ describe('middleware with subapps' , function() {
             return app;
         }
 
-        var metaRouterMiddleware = require('../middleware');
         app = express();
 
         app.use(metaRouterMiddleware.match([
                 {
                     path: 'GET /users/:user',
-                    handler: function(req, res) {
+                    handler(req, res) {
                         res.send({
                             user: req.params.user,
                             foo: req.route.config.foo
@@ -247,13 +247,13 @@ describe('middleware with subapps' , function() {
                 },
                 {
                     path: 'POST /users/:user/picture',
-                    handler: function(req, res) {
+                    handler(req, res) {
                         res.end('User profile picture updated!');
                     }
                 }
             ]));
 
-        app.use(function(req, res, next) {
+        app.use((req, res, next) => {
             req.matchedRoute = req.route;
             next();
         });
@@ -262,29 +262,29 @@ describe('middleware with subapps' , function() {
 
         app.use('/api', apiApp());
 
-        app.use(function(req, res, next){
+        app.use((req, res, next) => {
           res.send(404, 'Not Found');
         });
 
-        app.use(function(err, req, res, next){
+        app.use((err, req, res, next) => {
           console.error(err.stack);
           res.send(500, 'Server error');
         });
 
         server = http.createServer(app);
-        server.on('listening', function() {
+        server.on('listening', () => {
             port = server.address().port;
             done();
         });
         server.listen();
     });
 
-    after(function() {
+    after(() => {
         server.close();
     });
 
-    it('should match allow Express router to be used in subapp correctly', function(done) {
-        jsonRequest('/api/foo/123', 'GET', function(err, response, result) {
+    it('should match allow Express router to be used in subapp correctly', done => {
+        jsonRequest('/api/foo/123', 'GET', (err, response, result) => {
             if (err) {
                 return done(err);
             }
@@ -297,8 +297,8 @@ describe('middleware with subapps' , function() {
         });
     });
 
-    it('should match allow meta-router to be used in subapp', function(done) {
-        jsonRequest('/api/hello/345', 'GET', function(err, response, result) {
+    it('should match allow meta-router to be used in subapp', done => {
+        jsonRequest('/api/hello/345', 'GET', (err, response, result) => {
             if (err) {
                 return done(err);
             }
@@ -314,32 +314,32 @@ describe('middleware with subapps' , function() {
     });
 });
 
-describe('middleware using routes.json' , function() {
-    before(function(done) {
+describe('middleware using routes.json' , () => {
+    before(done => {
 
-        var metaRouterMiddleware = require('../middleware');
+        const metaRouterMiddleware = require('../middleware');
         app = express();
 
         app.use(metaRouterMiddleware.match(nodePath.join(__dirname, 'fixtures/routes.json')));
 
-        app.use(function(req, res, next) {
+        app.use((req, res, next) => {
             req.matchedRoute = req.route;
             next();
         });
 
         app.use(metaRouterMiddleware.invokeHandler());
 
-        app.use(function(req, res, next){
+        app.use((req, res, next) => {
           res.send(404, 'Not Found');
         });
 
-        app.use(function(err, req, res, next){
+        app.use((err, req, res, next) => {
           console.error(err.stack);
           res.send(500, 'Server error');
         });
 
         server = http.createServer(app);
-        server.on('listening', function() {
+        server.on('listening', () => {
             port = server.address().port;
             done();
         });
@@ -347,12 +347,12 @@ describe('middleware using routes.json' , function() {
         server.listen();
     });
 
-    after(function() {
+    after(() => {
         server.close();
     });
 
-    it('should match a route loaded from a json file', function(done) {
-        jsonRequest('/users/frank', 'GET', function(err, response, result) {
+    it('should match a route loaded from a json file', done => {
+        jsonRequest('/users/frank', 'GET', (err, response, result) => {
             if (err) {
                 return done(err);
             }
@@ -365,8 +365,8 @@ describe('middleware using routes.json' , function() {
         });
     });
 
-    it('should match a route loaded from a json file with a method', function(done) {
-        jsonRequest('/foo', 'GET', function(err, response, result) {
+    it('should match a route loaded from a json file with a method', done => {
+        jsonRequest('/foo', 'GET', (err, response, result) => {
             if (err) {
                 return done(err);
             }
