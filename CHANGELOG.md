@@ -1,6 +1,15 @@
 Changelog
 =========
 
+# 4.x
+
+## 4.0.x
+
+### 4.0.0
+
+- Add `meta-router/macro`
+- BREAKING CHANGE: Drop support for Node.js < 8
+
 # 3.x
 
 ## 3.0.x
