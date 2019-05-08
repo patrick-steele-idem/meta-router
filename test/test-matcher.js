@@ -1,10 +1,10 @@
-var expect = require('chai').expect;
-var nodePath = require('path');
+const expect = require('chai').expect;
+const nodePath = require('path');
 
-describe('matcher' , function() {
-    it('should match sample routes correctly', function() {
-        var metaRouter = require('../');
-        var matcher = metaRouter.buildMatcher([
+describe('matcher' , () => {
+    it('should match sample routes correctly', () => {
+        const metaRouter = require('../');
+        const matcher = metaRouter.buildMatcher([
             {
                 "path": "GET /users/:user",
                 "handler": function(req, res) {
@@ -21,7 +21,7 @@ describe('matcher' , function() {
             }
         ]);
 
-        var match = matcher.match('/users/123', 'GET');
+        let match = matcher.match('/users/123', 'GET');
         expect(match != null).to.equal(true);
         expect(match.path).to.equal('/users/123');
         expect(match.params).to.deep.equal({ user: '123' });
@@ -47,9 +47,9 @@ describe('matcher' , function() {
 
     });
 
-    it('should allow exact matches', function() {
-        var metaRouter = require('../');
-        var matcher = metaRouter.buildMatcher([
+    it('should allow exact matches', () => {
+        const metaRouter = require('../');
+        const matcher = metaRouter.buildMatcher([
             {
                 "path": "GET /exact",
                 "handler": function(req, res) {
@@ -59,16 +59,16 @@ describe('matcher' , function() {
             }
         ]);
 
-        var match = matcher.match('/exact', 'GET');
+        let match = matcher.match('/exact', 'GET');
         expect(match != null).to.equal(true);
 
         match = matcher.match('/exact/not', 'GET');
         expect(match == null).to.equal(true);
     });
 
-    it('should allow start matches', function() {
-        var metaRouter = require('../');
-        var matcher = metaRouter.buildMatcher([
+    it('should allow start matches', () => {
+        const metaRouter = require('../');
+        const matcher = metaRouter.buildMatcher([
             {
                 "path": "GET /first",
                 "handler": function(req, res) {
@@ -81,16 +81,16 @@ describe('matcher' , function() {
             }
         ]);
 
-        var match = matcher.match('/first', 'GET');
+        let match = matcher.match('/first', 'GET');
         expect(match != null).to.equal(true);
 
         match = matcher.match('/first/second', 'GET');
         expect(match != null).to.equal(true);
     });
 
-    it('should provide routes correctly', function() {
-        var metaRouter = require('../');
-        var matcher = metaRouter.buildMatcher([
+    it('should provide routes correctly', () => {
+        const metaRouter = require('../');
+        const matcher = metaRouter.buildMatcher([
             {
                 "path": "GET /users/:user",
                 "handler": function(req, res) {
@@ -119,7 +119,7 @@ describe('matcher' , function() {
             }
         ]);
 
-        var routes = matcher.routes;
+        const routes = matcher.routes;
         expect(routes.length).to.equal(4);
         expect(routes[0].path).to.equal('/users/:user');
         expect(routes[1].path).to.equal('/users/:user/picture');
@@ -139,14 +139,14 @@ describe('matcher' , function() {
 
     });
 
-    it('should allow buildMatcher to be called with a path and callback', function(done) {
-        var metaRouter = require('../');
-        metaRouter.buildMatcher(nodePath.join(__dirname, 'fixtures/routes.json'), function(err, matcher) {
+    it('should allow buildMatcher to be called with a path and callback', done => {
+        const metaRouter = require('../');
+        metaRouter.buildMatcher(nodePath.join(__dirname, 'fixtures/routes.json'), (err, matcher) => {
             if (err) {
                 return done(err);
             }
 
-            var match = matcher.match('/users/123', 'GET');
+            let match = matcher.match('/users/123', 'GET');
             expect(match != null).to.equal(true);
             expect(match.params).to.deep.equal({ user: '123' });
 
@@ -159,9 +159,9 @@ describe('matcher' , function() {
         });
     });
 
-    it('should allow method to be optional', function() {
-        var metaRouter = require('../');
-        var matcher = metaRouter.buildMatcher([
+    it('should allow method to be optional', () => {
+        const metaRouter = require('../');
+        const matcher = metaRouter.buildMatcher([
             {
                 path: "/users/:user/picture",
                 handler: function(req, res) {
@@ -178,7 +178,7 @@ describe('matcher' , function() {
             }
         ]);
 
-        var match = matcher.match('/users/123');
+        let match = matcher.match('/users/123');
         expect(match != null).to.equal(true);
         expect(match.path).to.equal('/users/123');
         expect(match.params).to.deep.equal({ user: '123' });
@@ -197,9 +197,9 @@ describe('matcher' , function() {
         expect(match.config.handler).to.be.a('function');
     });
 
-    it('should match a PUT route correctly', function() {
-        var metaRouter = require('../');
-        var matcher = metaRouter.buildMatcher([
+    it('should match a PUT route correctly', () => {
+        const metaRouter = require('../');
+        const matcher = metaRouter.buildMatcher([
             {
                 "path": "PUT /users/:user",
                 "handler": function(req, res) {
@@ -216,7 +216,7 @@ describe('matcher' , function() {
             }
         ]);
 
-        var match = matcher.match('/users/123', 'GET');
+        let match = matcher.match('/users/123', 'GET');
         expect(match == null).to.equal(true);
 
 

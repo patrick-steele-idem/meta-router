@@ -23,6 +23,7 @@
     },
     "homepage": "https://github.com/patrick-steele-idem/meta-router",
     "dependencies": {
+        "babel-plugin-macros": "^2.5.1",
         "jsonminify": "^0.2.3",
         "path-to-regexp": "^1.0.1",
         "raptor-async": "^1.1.1",
@@ -32,10 +33,13 @@
         "shortstop-handlers": "^1.0.0"
     },
     "devDependencies": {
+        "@babel/core": "^7.4.3",
+        "babel-plugin-tester": "^6.0.1",
         "chai": "^3.0.0",
         "express": "^4.7.2",
         "jshint": "^2.5.2",
         "mocha": "^2.2.5",
+        "prettier": "^1.16.4",
         "request": "^2.39.0"
     },
     "version": "3.0.2"

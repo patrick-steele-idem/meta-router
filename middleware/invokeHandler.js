@@ -1,15 +1,15 @@
 module.exports = function invokeHandlerFactory() {
     return function invokeHandler(req, res, next) {
-        var route = req.route;
-        var handler;
+        const route = req.route;
+        let handler;
 
         if (route && (handler = route.config._handler)) {
 
-            var params = route.params;
+            const params = route.params;
             
             if (params) {
-                var paramsTarget = req.params || (req.params = {});
-                for (var paramName in params) {
+                const paramsTarget = req.params || (req.params = {});
+                for (const paramName in params) {
                     paramsTarget[paramName] = params[paramName];
                 }
             }

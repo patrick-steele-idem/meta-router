@@ -425,6 +425,15 @@ For example,
 ]
 ```
 
+## `meta-router/macro`
+
+The `meta-router/macro` can be used to load the routes config at compile time using a [babel macro](https://github.com/kentcdodds/babel-plugin-macros).
+
+```js
+const loadRoutes = require("meta-router/macro");
+app.use(require('meta-router/middleware').match(loadRoutes("./path/to/routes.json")));
+```
+
 ## TODO
 
 - Add support for `beforeHandler` and `afterHandler` functions for each route
