@@ -59,7 +59,7 @@ function loadRoutesAsAST(routesPath, dirname, types) {
 function evalSync(getCode) {
   const cb = "(err, value) => process.stdout.write(JSON.stringify(value))";
   const code = getCode(cb);
-  const json = child_process.spawnSync(process.argv[0], ['-e', code]).stdout.toString();
+  const json = child_process.spawnSync(process.argv[0], ['-e', code], { cwd:__dirname }).stdout.toString();
   return JSON.parse(json);
 }
 
