@@ -42,5 +42,5 @@
         "prettier": "^1.16.4",
         "request": "^2.39.0"
     },
-    "version": "3.0.2"
+    "version": "4.0.0"
 }
