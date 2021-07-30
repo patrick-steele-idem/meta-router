@@ -9,3 +9,5 @@ module.exports = [{
   "path": "GET /bar",
   "handler": require("./../../user-with-meta.js").bar
 }];
+
+require("../../routes-shorthand.json");

@@ -12,6 +12,8 @@ module.exports = createMacro(loadRoutesMacro);
 function loadRoutesMacro({ references, state, babel }) {
   const filename = state.file.opts.filename;
   const dirname = path.dirname(filename);
+  const t = babel.types;
+
   references.default.forEach(referencePath => {
     if (referencePath.parentPath.type === "CallExpression") {
       const callExpressionPath = referencePath.parentPath;
@@ -22,13 +24,22 @@ function loadRoutesMacro({ references, state, babel }) {
       }
 
       const resolvedRoutesPath = path.resolve(dirname, routesPath);
-      const replacementAST = loadRoutesAsAST(resolvedRoutesPath, dirname, babel.types);
+      const replacementAST = loadRoutesAsAST(resolvedRoutesPath, dirname, t);
+      referencePath.hub.file.path.pushContainer(
+        'body',
+        t.expressionStatement(
+          t.callExpression(
+            t.identifier('require'),
+            [t.stringLiteral(routesPath)]
+          )
+        )
+      );
 
       callExpressionPath.replaceWith(replacementAST);
     } else {
       throw new Error(
         `The meta-router/macro must be used as a function: \`${referencePath
-          .findParent(babel.types.isExpression)
+          .findParent(t.isExpression)
           .getSource()}\`.`,
       );
     }
