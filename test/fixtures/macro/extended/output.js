@@ -9,3 +9,5 @@ module.exports = [{
   "path": "GET /bar",
   "handler": require("./../../user.js").bar
 }];
+
+require("../../routes.json");
