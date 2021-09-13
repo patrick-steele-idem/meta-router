@@ -1,0 +1,1 @@
+meta-router: you must first call init() with the route config before calling getMatch()

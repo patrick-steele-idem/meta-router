@@ -1,9 +1,0 @@
-[
-    "GET /users/:user => ./user-with-meta",
-    "GET /foo => ./user-with-meta#foo",
-    {
-        "path": "GET /bar => ./user-with-meta#bar",
-        "bar": true        
-    }
-
-]

@@ -1,14 +1,19 @@
-/work
-/build
-/.idea/
-/npm-debug.log
-/node_modules
-/*.sublime-workspace
-*.orig
-.DS_Store
+# Editor
+*.sublime*
+.vscode
+
+# OSX
+*.DS_Store
+
+# NPM
+node_modules
+npm-debug.log
+
+# Build
+dist
+*.actual.*
+*.tsbuildinfo
+
+# Coverage
+.nyc_output
 coverage
-/test/build
-*.actual.js
-*.actual.html
-.optimizer-cache
-.cache
