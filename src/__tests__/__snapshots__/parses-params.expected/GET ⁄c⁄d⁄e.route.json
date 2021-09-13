@@ -1,0 +1,10 @@
+{
+  "path": "/c/d/e",
+  "params": {
+    "parts": [
+      "d",
+      "e"
+    ]
+  },
+  "config": {}
+}
